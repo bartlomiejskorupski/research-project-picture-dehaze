@@ -99,7 +99,7 @@ def dehaze(filename, auto, r = 15, beta = 1.0, gf_r = 60, gf_eps = 0.001):
 
   dehazed_img = (dehazed_scaled * 255).clip(0, 255).astype(np.uint8)
 
-  return dehazed_img, img_arr, depth, region, refined_region, tR, atmospheric_light
+  return dehazed_img, img_arr, depth, region, refined_region, tR, atmospheric_light, r, beta, gf_r
 
 def estimateA(img, Jdark):
   h, w, _ = img.shape

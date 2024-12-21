@@ -25,7 +25,7 @@ app.add_middleware(
 @app.post("/dehaze")
 def read_root(image: UploadFile, auto: Annotated[bool, Form()], r: Annotated[int, Form()], beta: Annotated[float, Form()], gfr: Annotated[int, Form()]):
   original = np.asarray(Image.open(image.file))
-  dehazed, _, _, region, refinedRegion, transmission, atmospheric = dehaze(original, auto, r, beta, gfr, gf_eps=0.001)
+  dehazed, _, _, region, refinedRegion, transmission, atmospheric, r, beta, gf_r = dehaze(original, auto, r, beta, gfr, gf_eps=0.001)
   dehazedImg = Image.fromarray(dehazed)
   uuid = uuid4()
   regionScaled = normalize255(region)
@@ -46,7 +46,7 @@ def read_root(image: UploadFile, auto: Annotated[bool, Form()], r: Annotated[int
   refinedRegionImg.convert('RGB').save(f'temp/{refinedRegionFilename}')
   transmissionImg.convert('RGB').save(f'temp/{transmissionFilename}')
   atmosphericImg.save(f'temp/{atmosphericFilename}')
-  return {'dehazed': dehazedFilename, 'region': regionFilename, 'refinedRegion': refinedRegionFilename, 'transmission': transmissionFilename, 'atmospheric': atmosphericFilename}
+  return {'dehazed': dehazedFilename, 'region': regionFilename, 'refinedRegion': refinedRegionFilename, 'transmission': transmissionFilename, 'atmospheric': atmosphericFilename, 'r': r, 'beta': beta, 'gfr': gf_r}
 
 @app.get("/{img_name}",
   responses = {

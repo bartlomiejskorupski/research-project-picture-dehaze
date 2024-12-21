@@ -83,6 +83,9 @@ export class AppComponent {
           atmosphericLight: environment.apiUrl + res.atmospheric,
         });
         this.loading.set(false);
+        this.form.get('r')?.setValue(res.r);
+        this.form.get('beta')?.setValue(res.beta);
+        this.form.get('gfr')?.setValue(res.gfr);
       },
       err => {
         this.loading.set(false);
