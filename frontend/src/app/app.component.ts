@@ -29,8 +29,8 @@ import { DehazeOutput } from './model/dehaze-output.model';
 export class AppComponent {
   private fb = new FormBuilder();
   readonly form = this.fb.group({
-    r: [9, [Validators.required, Validators.min(3), Validators.max(39), Validators.pattern(/^\d+$/)]],
-    beta: [1.2, [Validators.required, Validators.min(0.01), Validators.max(2.0)]],
+    r: [9, [Validators.required, Validators.min(3), Validators.max(50), Validators.pattern(/^\d+$/)]],
+    beta: [1.2, [Validators.required, Validators.min(0.001), Validators.max(2.0)]],
     gfr: [60, [Validators.required, Validators.min(3), Validators.max(150), Validators.pattern(/^\d+$/)]],
     auto: [false, Validators.required],
   });
@@ -63,6 +63,10 @@ export class AppComponent {
       formData.append('r', '' + this.form.get('r')?.value);
       formData.append('beta', '' + this.form.get('beta')?.value);
       formData.append('gfr', '' + this.form.get('gfr')?.value);
+    } else {
+      formData.append('r', '0');
+      formData.append('beta', '0');
+      formData.append('gfr', '0');
     }
 
     this.loading.set(true);
