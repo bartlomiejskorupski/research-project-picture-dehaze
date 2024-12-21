@@ -1,0 +1,49 @@
+:host {
+  display: block;
+  margin: 2rem auto;
+  padding: 0;
+  max-width: 80%;
+}
+
+h1 {
+  font-size: 1.75rem;
+  margin-top: 0;
+}
+
+.advanced-options-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 6rem;
+  grid-gap: 1rem;
+  align-items: center;
+}
+
+.buttons-panel {
+  display: flex;
+  gap: .5rem;
+  margin-bottom: .5rem;
+}
+
+.output-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: .5rem;
+}
+
+.download-section {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: .5rem;
+}
+
+.stages-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .5rem;
+}
+
+@media (max-width: 768px) {
+  :host {
+    max-width: 100%;
+  }
+}

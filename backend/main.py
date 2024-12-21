@@ -1,6 +1,7 @@
 from typing import Annotated
 from fastapi import FastAPI, UploadFile, Form
 from fastapi.responses import Response, FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 from dehaze import dehaze
 from PIL import Image
 import numpy as np
@@ -8,6 +9,18 @@ from uuid import uuid4
 import matplotlib.pyplot as plt
 
 app = FastAPI()
+
+origins = [
+  "http://localhost:4200",
+]
+
+app.add_middleware(
+  CORSMiddleware,
+  allow_origins=origins,
+  allow_credentials=True,
+  allow_methods=["*"],
+  allow_headers=["*"],
+)
 
 @app.post("/dehaze")
 def read_root(image: UploadFile, r: Annotated[int, Form()], beta: Annotated[float, Form()], gfr: Annotated[int, Form()]):
