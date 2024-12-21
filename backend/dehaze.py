@@ -6,7 +6,8 @@ from cv2 import Mat
 from cv2.ximgproc import guidedFilter
 
 def dehaze(filename, r = 15, beta = 1.0, gf_r = 60, gf_eps = 0.001):
-  img = Image.open(filename)
+  #img = Image.open(filename)
+  img = Image.fromarray(filename)
   img_arr = np.asarray(img)
   img_scaled = img_arr / 255.0
 

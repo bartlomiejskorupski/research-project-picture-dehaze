@@ -109,7 +109,7 @@ def main():
 
 
 def show_all_stages():
-  dehazed, original, depth, region, refined_region, transmission, atmospheric =  dehaze('images/brick.jpg', gf_r=30, r=10, beta=1.0)
+  dehazed, original, depth, region, refined_region, transmission, atmospheric =  dehaze(original_image_path, gf_r=30, r=10, beta=1.0)
 
   fig, axs = plt.subplots(2, 3)
   axs[0, 0].imshow(original)
