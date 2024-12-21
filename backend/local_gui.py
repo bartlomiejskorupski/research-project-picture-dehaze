@@ -53,7 +53,9 @@ def process_original_image():
     print('No image chosen')
     return
   
-  dehazed, original, *_ =  dehaze(original_image_path, r, beta_int/100.0, guided_filter_r, guided_filter_eps)
+  img = Image.open(original_image_path)
+  img = np.asarray(img)
+  dehazed, original, *_ =  dehaze(img, r, beta_int/100.0, guided_filter_r, guided_filter_eps)
   o_img = Image.fromarray(original)
 
   w, h = calculate_picture_w_h(o_img.width, o_img.height)
@@ -109,7 +111,9 @@ def main():
 
 
 def show_all_stages():
-  dehazed, original, depth, region, refined_region, transmission, atmospheric =  dehaze(original_image_path, gf_r=30, r=10, beta=1.0)
+  img = Image.open(original_image_path)
+  img = np.asarray(img)
+  dehazed, original, depth, region, refined_region, transmission, atmospheric =  dehaze(img, gf_r=30, r=10, beta=1.0)
 
   fig, axs = plt.subplots(2, 3)
   axs[0, 0].imshow(original)
