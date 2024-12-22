@@ -6,34 +6,53 @@
   </mat-card-header>
   <mat-card-content>
     <form (submit)="onSubmit($event)" [formGroup]="form">
-      <div class="buttons-panel">
-        <input #fileInput hidden type="file" (change)="onFileChange($event)" accept="image/*"/>
-        <button mat-flat-button type="button" (click)="fileInput.click()">Select file</button>
-        <button mat-flat-button type="submit" [disabled]="isSubmitDisabled()">Dehaze</button>
-      </div>
       <mat-expansion-panel>
         <mat-expansion-panel-header>
           <mat-panel-title>Advanced options</mat-panel-title>
         </mat-expansion-panel-header>
         <div class="advanced-options-panel">
+          <mat-slider min="3" max="50" step="1" [disabled]="isAutoEnabled()">
+            <input matSliderThumb [(ngModel)]="sliderRValue" [ngModelOptions]="{standalone: true}"/>
+          </mat-slider>
+          <mat-slider min="0.001" max="2.0" step="0.001" [disabled]="isAutoEnabled()">
+            <input matSliderThumb [(ngModel)]="sliderBetaValue" [ngModelOptions]="{standalone: true}"/>
+          </mat-slider>
+          <mat-slider min="3" max="150" step="1" [disabled]="isAutoEnabled()">
+            <input matSliderThumb [(ngModel)]="sliderGFRValue" [ngModelOptions]="{standalone: true}"/>
+          </mat-slider>
+          <mat-slide-toggle formControlName="auto" (change)="onAutoChange()" matTooltip="Automatically adjust parameters" matTooltipPosition="above">Auto</mat-slide-toggle>
           <mat-form-field>
-            <mat-label>R</mat-label>
-            <input matInput type="number" formControlName="r" min="3" max="50">
+            <mat-label>
+              <mat-icon matTooltip="The size of the mininum filter used in creating the depth map. Higher values may leave haze around foreground objects." matTooltipPosition="below">info</mat-icon>
+              <span>R</span>
+            </mat-label>
+            <input matInput type="number" formControlName="r" min="3" max="50" (input)="setSliderValue('r', $event)">
             <mat-error>Must be an integer between 3 and 50</mat-error>
           </mat-form-field>
           <mat-form-field>
-            <mat-label>Beta</mat-label>
-            <input matInput type="number" formControlName="beta">
+            <mat-label>
+              <mat-icon matTooltip="The scattering coefficient. Higher values give stronger dehazing effects, but may impact contrast." matTooltipPosition="below">info</mat-icon>
+              <span>Beta</span>
+            </mat-label>
+            <input matInput type="number" formControlName="beta" (input)="setSliderValue('beta', $event)">
             <mat-error>Must be a floating point number between 0.001 and 2.0</mat-error>
           </mat-form-field>
           <mat-form-field>
-            <mat-label>Guided filter R</mat-label>
-            <input matInput type="number" formControlName="gfr">
+            <mat-label>
+              <mat-icon matTooltip="The size of the guided filter used in refining the depth map. Higher values better remove haze around foreground objects." matTooltipPosition="below">info</mat-icon>
+              <span>Guided Filter R</span>
+            </mat-label>
+            <input matInput type="number" formControlName="gfr" (input)="setSliderValue('gfr', $event)">
             <mat-error>Must be an integer between 3 and 150</mat-error>
           </mat-form-field>
-          <mat-slide-toggle formControlName="auto" (change)="onAutoChange()">Auto</mat-slide-toggle>
+          <mat-slide-toggle formControlName="stages" matTooltip="Generate images at each of the algorithm's stages" matTooltipPosition="below">Save Stages</mat-slide-toggle>
         </div>
       </mat-expansion-panel>
+      <div class="buttons-panel">
+        <input #fileInput hidden type="file" (change)="onFileChange($event)" accept="image/*"/>
+        <button mat-flat-button type="button" (click)="fileInput.click()">Select file</button>
+        <button mat-flat-button type="submit" [disabled]="isSubmitDisabled()">Dehaze</button>
+      </div>
     </form>
     <div class="output-section">
       @if (originalImg()) {
@@ -49,15 +68,17 @@
         <mat-icon>download dehazed</mat-icon>
         Download
       </button>
-      <mat-slide-toggle #showStagesToggle>Show stages</mat-slide-toggle>
+      <mat-slide-toggle #showStagesToggle [disabled]="!isStagesEnabled()">Show stages</mat-slide-toggle>
     </div>
     @if (showStagesToggle.checked) {
       <div class="stages-section">
         @if (outputImages(); as images) {
-          <app-img-container [src]="images.region" name="Region" />
-          <app-img-container [src]="images.refinedRegion" name="Refined Region" />
-          <app-img-container [src]="images.atmosphericLight" name="Atmospheric Light" />
-          <app-img-container [src]="images.transmission" name="Transmission" />
+          @if (isStagesEnabled()) {
+            <app-img-container [src]="images.region!" name="Region" />
+            <app-img-container [src]="images.refinedRegion!" name="Refined Region" />
+            <app-img-container [src]="images.atmosphericLight!" name="Atmospheric Light" />
+            <app-img-container [src]="images.transmission!" name="Transmission" />
+          }
         }
       </div>
     }

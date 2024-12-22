@@ -13,14 +13,14 @@ h1 {
 .advanced-options-panel {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 6rem;
-  grid-gap: 1rem;
+  column-gap: .5rem;
   align-items: center;
 }
 
 .buttons-panel {
   display: flex;
   gap: .5rem;
-  margin-bottom: .5rem;
+  margin-top: .5rem;
 }
 
 .output-section {
