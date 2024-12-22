@@ -7,6 +7,7 @@ from PIL import Image
 import numpy as np
 from uuid import uuid4
 import matplotlib.pyplot as plt
+import os
 
 app = FastAPI()
 
@@ -56,7 +57,10 @@ def read_root(image: UploadFile, auto: Annotated[bool, Form()], r: Annotated[int
   },
   response_class=FileResponse)
 def get_image(img_name: str):
-  return FileResponse(f"temp/{img_name}")
+  filename = f"temp/{img_name}"
+  if not os.path.isfile(filename):
+    return Response(status_code=404)
+  return FileResponse(filename)
 
 def normalize255(arr):
   return ((arr - arr.min()) / (arr.max() - arr.min()) * 255).astype(np.uint8)

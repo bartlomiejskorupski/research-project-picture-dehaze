@@ -7,39 +7,37 @@ from cv2 import Mat
 from cv2.ximgproc import guidedFilter
 
 def estimate_parameters(image):
-    # Compute haze density (e.g., using global contrast or entropy)
-    haze_density = measure.shannon_entropy(image)
+  # Compute haze density using Shannon entropy
+  haze_density = measure.shannon_entropy(image)
 
-    # Compute local variance to estimate guided filter epsilon
-    img_size = image.shape[0] * image.shape[1]
+  # Compute gradient
+  img_size = image.shape[0] * image.shape[1]
+  gradient = filters.sobel(image)
+  
+  # Estimate r (matrix size) based on image size
+  r = int(np.clip(np.sqrt(img_size) / 20, 3, 50))
 
-    gradient = filters.sobel(image)
-    local_variance = np.var(gradient)
-    
-    # Estimate r (matrix size) based on image size
-    r = int(np.clip(np.sqrt(img_size) / 20, 3, 50))
+  # Estimate beta based on haze density
+  beta = max(0.5, min(1.0, 0.8 + haze_density * 0.05))
 
-    # Estimate beta (guided filter radius) based on haze density
-    beta = max(0.5, min(1.0, 0.8 + haze_density * 0.05))
+  # Epsilon estimation
+  gf_eps = 0.001
 
-    # Estimate epsilon (guided filter regularization) based on local variance
-    gf_eps = 0.001
+  # Entropy-based radius
+  histogram, _ = np.histogram(image.flatten(), bins=256, range=(0, 256))
+  histogram = histogram / np.sum(histogram)
+  entropy = -np.sum(histogram * np.log2(histogram + 1e-7))
+  entropy_r = 50 / (entropy + 1e-7)
 
-    # Entropy-based radius
-    histogram, _ = np.histogram(image.flatten(), bins=256, range=(0, 256))
-    histogram = histogram / np.sum(histogram)
-    entropy = -np.sum(histogram * np.log2(histogram + 1e-7))
-    entropy_r = 50 / (entropy + 1e-7)
+  # Gradient-based radius
+  avg_gradient = np.mean(gradient)
+  gradient_r = 50 - avg_gradient * 10
 
-    # Gradient-based radius
-    avg_gradient = np.mean(gradient)
-    gradient_r = 50 - avg_gradient * 10
-
-    # Combine radius using weights
-    gf_r = int(np.clip(0.5 * r + 0.3 * entropy_r + 0.2 * gradient_r, 50, 100))
-   
-    print(f"Parameters: r={r}, beta={beta}, gf_eps={gf_eps}, gf_r={gf_r}")
-    return r, beta, gf_eps, gf_r
+  # Combine radius using weights
+  gf_r = int(np.clip(0.5 * r + 0.3 * entropy_r + 0.2 * gradient_r, 50, 100))
+  
+  print(f"Parameters: r={r}, beta={beta}, gf_eps={gf_eps}, gf_r={gf_r}")
+  return r, beta, gf_eps, gf_r
 
 def dehaze(filename, auto, r = 15, beta = 1.0, gf_r = 60, gf_eps = 0.001):
   #img = Image.open(filename)
@@ -54,7 +52,7 @@ def dehaze(filename, auto, r = 15, beta = 1.0, gf_r = 60, gf_eps = 0.001):
   img_hsv = img.convert('HSV')
   hsv_arr = np.asarray(img_hsv)
 
-  # Estimated deph coefficients
+  # Estimated depth coefficients
   theta_0 = 0.121779
   theta_1 = 0.95971
   theta_2 = -0.780245
